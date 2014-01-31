@@ -32,3 +32,6 @@ distclean:
 
 %.html : %.cpp c2html
 	./c2html $< > $@
+
+tar:
+	git archive --prefix=c2html/ -o c2html.tar.gz HEAD
