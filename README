@@ -1,0 +1,10 @@
+Project: C++ pretty-printer
+Author: Ben Longbons <brlongbons@gmail.com>
+Build: make
+Usage: ./c2html source.cpp > source.html
+Listing:
+  .gitignore: List of generated files
+  Makefile: Automatic build instructions
+  README: This file
+  c-lex.lpp: Lexer
+  c2html.cpp: Driver

@@ -1,0 +1,303 @@
+%option noyywrap
+%option prefix="cc"
+%option reentrant
+/* doesn't work
+%option yylineno */
+%option warn nodefault
+%option stack
+
+%x MLC
+
+%top{
+    enum
+    {
+        NEWLINE = 256,
+        WHITESPACE,
+        COMMENT,
+        DIRECTIVE,
+        UNKNOWN,
+        IDENTIFIER,
+        CONSTANT,
+        KEYWORD,
+        NUMBER,
+        STRING,
+        CHARACTER,
+        OPERATOR,
+    };
+
+    void unexpected(const char *arg);
+}
+
+/* options to get rid of compiler warnings */
+%option nounput noyy_top_state noyyalloc noyyrealloc noyyfree
+
+%{
+    // Hack to get rid of a compiler warning in yy_fatal_error
+    // since %option noyy_fatal_error doesn't work
+    #define fprintf yyscanner, fprintf
+
+    // These are, relatively speaking, not a hack.
+    void *ccalloc(size_t size, yyscan_t)
+    {
+        return malloc(size);
+    }
+
+    void *ccrealloc(void *ptr, size_t size, yyscan_t)
+    {
+        return realloc(ptr, size);
+    }
+
+    void ccfree(void *ptr, yyscan_t)
+    {
+        free(ptr);
+    }
+%}
+
+%%
+
+<*>\n                       return NEWLINE;
+[ \t\v\f\r]+                return WHITESPACE;
+#.*                         return DIRECTIVE;
+"//".*                      return COMMENT;
+
+"/*"                        yy_push_state(MLC, yyscanner); yymore();
+<MLC>{
+    ./\n                    return COMMENT;
+    [^*\n]                  yymore();
+    "*"/[^/]                yymore();
+    "*/"                    yy_pop_state(yyscanner); return COMMENT;
+    .                       unexpected("EOF");
+    <<EOF>>                 unexpected("EOF");
+}
+
+
+alignas                     return KEYWORD;
+alignof                     return KEYWORD;
+and                         return KEYWORD;
+and_eq                      return KEYWORD;
+asm                         return KEYWORD;
+auto                        return KEYWORD;
+bitand                      return KEYWORD;
+bitor                       return KEYWORD;
+bool                        return KEYWORD;
+break                       return KEYWORD;
+case                        return KEYWORD;
+catch                       return KEYWORD;
+char                        return KEYWORD;
+char16_t                    return KEYWORD;
+char32_t                    return KEYWORD;
+class                       return KEYWORD;
+compl                       return KEYWORD;
+const                       return KEYWORD;
+constexpr                   return KEYWORD;
+const_cast                  return KEYWORD;
+continue                    return KEYWORD;
+decltype                    return KEYWORD;
+default                     return KEYWORD;
+delete                      return KEYWORD;
+do                          return KEYWORD;
+double                      return KEYWORD;
+dynamic_cast                return KEYWORD;
+else                        return KEYWORD;
+enum                        return KEYWORD;
+explicit                    return KEYWORD;
+export                      return KEYWORD;
+extern                      return KEYWORD;
+false                       return KEYWORD;
+float                       return KEYWORD;
+for                         return KEYWORD;
+friend                      return KEYWORD;
+goto                        return KEYWORD;
+if                          return KEYWORD;
+inline                      return KEYWORD;
+int                         return KEYWORD;
+long                        return KEYWORD;
+mutable                     return KEYWORD;
+namespace                   return KEYWORD;
+new                         return KEYWORD;
+noexcept                    return KEYWORD;
+not                         return KEYWORD;
+not_eq                      return KEYWORD;
+nullptr                     return KEYWORD;
+operator                    return KEYWORD;
+or                          return KEYWORD;
+or_eq                       return KEYWORD;
+private                     return KEYWORD;
+protected                   return KEYWORD;
+public                      return KEYWORD;
+register                    return KEYWORD;
+reinterpret_cast            return KEYWORD;
+return                      return KEYWORD;
+short                       return KEYWORD;
+signed                      return KEYWORD;
+sizeof                      return KEYWORD;
+static                      return KEYWORD;
+static_assert               return KEYWORD;
+static_cast                 return KEYWORD;
+struct                      return KEYWORD;
+switch                      return KEYWORD;
+template                    return KEYWORD;
+this                        return KEYWORD;
+thread_local                return KEYWORD;
+throw                       return KEYWORD;
+true                        return KEYWORD;
+try                         return KEYWORD;
+typedef                     return KEYWORD;
+typeid                      return KEYWORD;
+typename                    return KEYWORD;
+union                       return KEYWORD;
+unsigned                    return KEYWORD;
+using                       return KEYWORD;
+virtual                     return KEYWORD;
+void                        return KEYWORD;
+volatile                    return KEYWORD;
+wchar_t                     return KEYWORD;
+while                       return KEYWORD;
+xor                         return KEYWORD;
+xor_eq                      return KEYWORD;
+
+override                    return KEYWORD;
+final                       return KEYWORD;
+__attribute__               return KEYWORD;
+__asm__                     return KEYWORD;
+__imag__                    return KEYWORD;
+__real__                    return KEYWORD;
+restrict                    return KEYWORD;
+__restrict__                return KEYWORD;
+
+size_t                      return KEYWORD;
+ssize_t                     return KEYWORD;
+off_t                       return KEYWORD;
+ptrdiff_t                   return KEYWORD;
+sig_atomic_t                return KEYWORD;
+fpos_t                      return KEYWORD;
+clock_t                     return KEYWORD;
+time_t                      return KEYWORD;
+va_list                     return KEYWORD;
+jmp_buf                     return KEYWORD;
+FILE                        return KEYWORD;
+DIR                         return KEYWORD;
+div_t                       return KEYWORD;
+ldiv_t                      return KEYWORD;
+mbstate_t                   return KEYWORD;
+wctrans_t                   return KEYWORD;
+wint_t                      return KEYWORD;
+wctype_t                    return KEYWORD;
+
+_Bool                       return KEYWORD;
+_Complex                    return KEYWORD;
+complex                     return KEYWORD;
+_Imaginary                  return KEYWORD;
+imaginary                   return KEYWORD;
+int8_t                      return KEYWORD;
+int16_t                     return KEYWORD;
+int32_t                     return KEYWORD;
+int64_t                     return KEYWORD;
+uint8_t                     return KEYWORD;
+uint16_t                    return KEYWORD;
+uint32_t                    return KEYWORD;
+uint64_t                    return KEYWORD;
+int_least8_t                return KEYWORD;
+int_least16_t               return KEYWORD;
+int_least32_t               return KEYWORD;
+int_least64_t               return KEYWORD;
+uint_least8_t               return KEYWORD;
+uint_least16_t              return KEYWORD;
+uint_least32_t              return KEYWORD;
+uint_least64_t              return KEYWORD;
+int_fast8_t                 return KEYWORD;
+int_fast16_t                return KEYWORD;
+int_fast32_t                return KEYWORD;
+int_fast64_t                return KEYWORD;
+uint_fast8_t                return KEYWORD;
+uint_fast16_t               return KEYWORD;
+uint_fast32_t               return KEYWORD;
+uint_fast64_t               return KEYWORD;
+intptr_t                    return KEYWORD;
+uintptr_t                   return KEYWORD;
+intmax_t                    return KEYWORD;
+uintmax_t                   return KEYWORD;
+__label__                   return KEYWORD;
+__complex__                 return KEYWORD;
+__volatile__                return KEYWORD;
+
+_Alignas                    return KEYWORD;
+_Alignof                    return KEYWORD;
+_Atomic                     return KEYWORD;
+_Generic                    return KEYWORD;
+_Noreturn                   return KEYWORD;
+_Static_assert              return KEYWORD;
+_Thread_local               return KEYWORD;
+
+_[A-Z][A-Za-z_0-9]*         return KEYWORD;
+[A-Za-z_]*__[A-Za-z_0-9]*   return KEYWORD;
+
+\<=                         return OPERATOR;
+>=                          return OPERATOR;
+\<<                         return OPERATOR;
+>>                          return OPERATOR;
+\<<=                        return OPERATOR;
+>>=                         return OPERATOR;
+\<\?                        return OPERATOR;
+>\?                         return OPERATOR;
+\?                          return OPERATOR;
+:                           return OPERATOR;
+::                          return OPERATOR;
+-                           return OPERATOR;
+--                          return OPERATOR;
+->                          return OPERATOR;
+-=                          return OPERATOR;
+\+                          return OPERATOR;
+\+\+                        return OPERATOR;
+\+=                         return OPERATOR;
+\[                          return OPERATOR;
+\]                          return OPERATOR;
+\(                          return OPERATOR;
+\)                          return OPERATOR;
+\<                          return OPERATOR;
+>                           return OPERATOR;
+\{                          return OPERATOR;
+\}                          return OPERATOR;
+=                           return OPERATOR;
+==                          return OPERATOR;
+\.                          return OPERATOR;
+\.\.                        return OPERATOR;
+\.\.\.                      return OPERATOR;
+,                           return OPERATOR;
+!                           return OPERATOR;
+!=                          return OPERATOR;
+~                           return OPERATOR;
+%                           return OPERATOR;
+%=                          return OPERATOR;
+\^                          return OPERATOR;
+\^=                         return OPERATOR;
+\*                          return OPERATOR;
+\*=                         return OPERATOR;
+&                           return OPERATOR;
+&=                          return OPERATOR;
+&&                          return OPERATOR;
+\|                          return OPERATOR;
+\|=                         return OPERATOR;
+\|\|                        return OPERATOR;
+;                           return OPERATOR;
+\/                          return OPERATOR;
+\/=                         return OPERATOR;
+
+[A-Z_][A-Z_0-9]*            return CONSTANT;
+[A-Za-z_][A-Za-z_0-9]*      return IDENTIFIER;
+[0-9]+(\.[0-9]*)?[FULful]*/[^A-Za-z_0-9]    return NUMBER;
+\.[0-9]+[FULful]*/[^A-Za-z_0-9]             return NUMBER;
+\"([^\\"\n]|\\.)*\"         return STRING;
+\'([^\\'\n]|\\.)*\'         return CHARACTER;
+
+.                           return UNKNOWN;
+
+%%
+
+void unexpected(const char *arg)
+{
+    // undo the hack above
+#undef fprintf
+    fprintf(stderr, "Unexpected %s\n", arg);
+    abort();
+}
