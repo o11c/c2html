@@ -54,7 +54,7 @@ int main(int argc, char **argv)
         "<html>\n"
         "<head>\n"
         "<title>%s</title>\n"
-        "<style>\n"
+        "<style type=\"text/css\">\n"
         "code { white-space: pre ; display: block; unicode-bidi: embed }\n"
         ".directive { color: darkmagenta }\n"
         ".comment { color: blue }\n"
